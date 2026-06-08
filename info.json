@@ -1,17 +1,9 @@
 {
-  "name": "local_quickstart",
+  "name": "research_reward_stacks",
   "version": "0.1.0",
-  "title": "Local Quickstart",
+  "title": "Research Reward Stacks",
   "author": "local",
   "factorio_version": "2.0",
-  "description": "Gives a practical Angel/Bob early-game quickstart loadout on player creation.",
-  "dependencies": [
-    "base >= 2.0.0",
-    "bobmining",
-    "boblogistics",
-    "bobpower",
-    "bobassembly",
-    "angelsaddons-bots",
-    "angelsrefining"
-  ]
+  "description": "Whenever research finishes, grants each player a full stack of each newly unlocked constructable item.",
+  "dependencies": ["base >= 2.0.0"]
 }
