@@ -1,0 +1,17 @@
+{
+  "name": "local_quickstart",
+  "version": "0.1.0",
+  "title": "Local Quickstart",
+  "author": "local",
+  "factorio_version": "2.0",
+  "description": "Gives a practical Angel/Bob early-game quickstart loadout on player creation.",
+  "dependencies": [
+    "base >= 2.0.0",
+    "bobmining",
+    "boblogistics",
+    "bobpower",
+    "bobassembly",
+    "angelsaddons-bots",
+    "angelsrefining"
+  ]
+}
