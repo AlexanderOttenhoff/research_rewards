@@ -1,3 +1,27 @@
+---@param item_proto LuaItemPrototype
+---@return boolean
+local function is_placeable(item_proto)
+  return item_proto.place_result ~= nil or item_proto.place_as_tile_result ~= nil
+end
+
+-- Returns true if any of the recipes producing this item are hand-craftable
+-- (i.e. use the "crafting" category, which the player inventory can perform).
+---@param item_name string
+---@param force LuaForce
+---@return boolean
+local function is_hand_craftable(item_name, force)
+  for _, recipe in pairs(force.recipes) do
+    if recipe.enabled and recipe.prototype.category == "crafting" then
+      for _, product in pairs(recipe.products) do
+        if product.type == "item" and product.name == item_name then
+          return true
+        end
+      end
+    end
+  end
+  return false
+end
+
 ---@param technology LuaTechnology
 ---@return table<string, boolean>
 local function get_newly_craftable_items(technology)
@@ -29,13 +53,20 @@ local function grant_research_rewards(event)
   end
 
   local constructable_items = get_newly_craftable_items(technology)
+  local grant_non_placeable = settings.global["research-reward-stacks-grant-non-placeable"].value
+  local grant_non_hand_craftable = settings.global["research-reward-stacks-grant-non-hand-craftable"].value
 
   local item_entries = {}
   for item_name, _ in pairs(constructable_items) do
     local item_proto = prototypes.item[item_name]
     if item_proto then
-      local stack_size = item_proto.stack_size or 50
-      table.insert(item_entries, { name = item_name, proto = item_proto, stack_size = stack_size })
+      local placeable = is_placeable(item_proto)
+      local hand_craftable = is_hand_craftable(item_name, technology.force)
+
+      if (grant_non_placeable or placeable) and (grant_non_hand_craftable or hand_craftable) then
+        local stack_size = item_proto.stack_size or 50
+        table.insert(item_entries, { name = item_name, proto = item_proto, stack_size = stack_size })
+      end
     end
   end
 
