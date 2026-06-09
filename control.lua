@@ -87,6 +87,7 @@ local function grant_research_rewards(event)
   local grant_non_placeable = settings.global["research-rewards-grant-non-placeable"].value
   local grant_non_hand_craftable = settings.global["research-rewards-grant-non-hand-craftable"].value
   local grant_liquids = settings.global["research-rewards-grant-liquids"].value
+  local stack_fraction = settings.global["research-rewards-stack-fraction"].value / 100
 
   local item_entries = {}
   for item_name, _ in pairs(newly_craftable.items) do
@@ -96,7 +97,7 @@ local function grant_research_rewards(event)
       local hand_craftable = is_hand_craftable(item_name, technology.force)
 
       if (grant_non_placeable or placeable) and (grant_non_hand_craftable or hand_craftable) then
-        local stack_size = item_proto.stack_size or 50
+        local stack_size = math.max(1, math.floor((item_proto.stack_size or 50) * stack_fraction))
         table.insert(item_entries, { name = item_name, proto = item_proto, stack_size = stack_size })
       end
     end
@@ -108,7 +109,7 @@ local function grant_research_rewards(event)
       for container_name, _ in pairs(containers) do
         local item_proto = prototypes.item[container_name]
         if item_proto then
-          local stack_size = item_proto.stack_size or 50
+          local stack_size = math.max(1, math.floor((item_proto.stack_size or 50) * stack_fraction))
           table.insert(item_entries, { name = container_name, proto = item_proto, stack_size = stack_size })
         end
       end

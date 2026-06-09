@@ -27,4 +27,12 @@ data:extend({
     default_value = false,
     order = "d",
   },
+  {
+    type = "int-setting",
+    name = "research-rewards-stack-fraction",
+    setting_type = "runtime-global",
+    default_value = 100,
+    minimum_value = 1,
+    order = "e",
+  },
 })
