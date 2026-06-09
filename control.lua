@@ -49,9 +49,9 @@ local function grant_research_rewards(event)
         player.insert({ name = entry.name, count = entry.stack_size })
       end
 
-      player.print({"", "Research reward from ", technology.localised_name, ":"})
+      player.print({ "", "Research reward from ", technology.localised_name, ":" })
       for _, entry in pairs(item_entries) do
-        player.print({"", "  - ", entry.proto.localised_name, " (x", entry.stack_size, ")"})
+        player.print({ "", "  - ", entry.proto.localised_name, " (x", entry.stack_size, ")" })
       end
     end
   end
