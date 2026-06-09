@@ -84,9 +84,9 @@ local function grant_research_rewards(event)
   end
 
   local newly_craftable = get_newly_craftable(technology)
-  local grant_non_placeable = settings.global["research-reward-stacks-grant-non-placeable"].value
-  local grant_non_hand_craftable = settings.global["research-reward-stacks-grant-non-hand-craftable"].value
-  local grant_liquids = settings.global["research-reward-stacks-grant-liquids"].value
+  local grant_non_placeable = settings.global["research-rewards-grant-non-placeable"].value
+  local grant_non_hand_craftable = settings.global["research-rewards-grant-non-hand-craftable"].value
+  local grant_liquids = settings.global["research-rewards-grant-liquids"].value
 
   local item_entries = {}
   for item_name, _ in pairs(newly_craftable.items) do
@@ -125,7 +125,7 @@ local function grant_research_rewards(event)
         player.insert({ name = entry.name, count = entry.stack_size })
       end
 
-      if settings.get_player_settings(player)["research-reward-stacks-show-message"].value then
+      if settings.get_player_settings(player)["research-rewards-show-message"].value then
         player.print({ "", "Research reward from ", technology.localised_name, ":" })
         for _, entry in pairs(item_entries) do
           player.print({ "", "  - ", entry.proto.localised_name, " (x", entry.stack_size, ")" })

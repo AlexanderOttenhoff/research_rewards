@@ -1,7 +1,7 @@
 {
-  "name": "research_reward_stacks",
+  "name": "research_rewards",
   "version": "0.1.0",
-  "title": "Research Reward Stacks",
+  "title": "Research Rewards",
   "author": "local",
   "factorio_version": "2.0",
   "description": "Whenever research finishes, grants each player a full stack of each newly unlocked constructable item.",
