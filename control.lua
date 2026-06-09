@@ -1,28 +1,17 @@
----@diagnostic disable: undefined-global
-
-local function is_constructable_item(item_proto)
-  if not item_proto then
-    return false
-  end
-
-  return item_proto.place_result ~= nil or item_proto.place_as_tile_result ~= nil
-end
-
-local function get_unlocked_constructable_items(technology)
+---@param technology LuaTechnology
+---@return table<string, boolean>
+local function get_newly_craftable_items(technology)
   local items = {}
   local force = technology.force
+  local tech_proto = technology.prototype
 
-  for _, effect in pairs(technology.effects or {}) do
+  for _, effect in pairs(tech_proto.effects or {}) do
     if effect.type == "unlock-recipe" and effect.recipe then
       local recipe = force.recipes[effect.recipe]
       if recipe then
         for _, product in pairs(recipe.products) do
           if product.type == "item" then
-            local item_name = product.name
-            local item_proto = game.item_prototypes[item_name]
-            if is_constructable_item(item_proto) then
-              items[item_name] = true
-            end
+            items[product.name] = true
           end
         end
       end
@@ -32,28 +21,37 @@ local function get_unlocked_constructable_items(technology)
   return items
 end
 
+---@param event EventData.on_research_finished
 local function grant_research_rewards(event)
   local technology = event.research
   if not technology then
     return
   end
 
-  local constructable_items = get_unlocked_constructable_items(technology)
-  local granted_count = 0
+  local constructable_items = get_newly_craftable_items(technology)
+
+  local item_entries = {}
+  for item_name, _ in pairs(constructable_items) do
+    local item_proto = prototypes.item[item_name]
+    if item_proto then
+      local stack_size = item_proto.stack_size or 50
+      table.insert(item_entries, { name = item_name, proto = item_proto, stack_size = stack_size })
+    end
+  end
+
+  if #item_entries == 0 then
+    return
+  end
 
   for _, player in pairs(technology.force.players) do
     if player and player.valid then
-      for item_name, _ in pairs(constructable_items) do
-        local item_proto = game.item_prototypes[item_name]
-        if item_proto then
-          local stack_size = item_proto.stack_size or 50
-          player.insert({ name = item_name, count = stack_size })
-          granted_count = granted_count + 1
-        end
+      for _, entry in pairs(item_entries) do
+        player.insert({ name = entry.name, count = entry.stack_size })
       end
 
-      if granted_count > 0 then
-        player.print("Research reward: granted full stacks of newly unlocked constructable items from " .. technology.localised_name .. ".")
+      player.print({"", "Research reward from ", technology.localised_name, ":"})
+      for _, entry in pairs(item_entries) do
+        player.print({"", "  - ", entry.proto.localised_name, " (x", entry.stack_size, ")"})
       end
     end
   end
