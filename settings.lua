@@ -24,7 +24,7 @@ data:extend({
     type = "bool-setting",
     name = "research-rewards-grant-liquids",
     setting_type = "runtime-global",
-    default_value = false,
+    default_value = true,
     order = "d",
   },
   {
@@ -34,5 +34,12 @@ data:extend({
     default_value = 100,
     minimum_value = 1,
     order = "e",
+  },
+  {
+    type = "bool-setting",
+    name = "research-rewards-spill-overflow",
+    setting_type = "runtime-global",
+    default_value = true,
+    order = "f",
   },
 })

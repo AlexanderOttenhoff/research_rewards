@@ -74,6 +74,7 @@ local function grant_research_rewards(event)
   local grant_non_hand_craftable = settings.global["research-rewards-grant-non-hand-craftable"].value
   local grant_liquids = settings.global["research-rewards-grant-liquids"].value
   local stack_fraction = settings.global["research-rewards-stack-fraction"].value / 100
+  local spill_overflow = settings.global["research-rewards-spill-overflow"].value
 
   local item_entries = {}
   for item_name, _ in pairs(newly_craftable.items) do
@@ -107,7 +108,17 @@ local function grant_research_rewards(event)
   for _, player in pairs(technology.force.players) do
     if player and player.valid then
       for _, entry in pairs(item_entries) do
-        player.insert({ name = entry.name, count = entry.stack_size })
+        local inserted = player.insert({ name = entry.name, count = entry.stack_size })
+        local remainder = entry.stack_size - inserted
+        if remainder > 0 and spill_overflow then
+          player.surface.spill_item_stack({
+            position = player.position,
+            stack = { name = entry.name, count = remainder },
+            enable_looted = true,
+            force = player.force,
+            allow_belts = false,
+          })
+        end
       end
 
       if settings.get_player_settings(player)["research-rewards-show-message"].value then
