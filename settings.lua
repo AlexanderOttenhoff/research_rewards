@@ -17,7 +17,7 @@ data:extend({
     type = "bool-setting",
     name = "research-rewards-grant-non-hand-craftable",
     setting_type = "runtime-global",
-    default_value = false,
+    default_value = true,
     order = "c",
   },
   {
