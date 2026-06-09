@@ -22,10 +22,39 @@ local function is_hand_craftable(item_name, force)
   return false
 end
 
----@param technology LuaTechnology
+-- For a fluid, find the item(s) used to store it.
+-- Returns a table of item names that can hold this fluid.
+---@param fluid_name string
 ---@return table<string, boolean>
-local function get_newly_craftable_items(technology)
+local function find_containers_for_fluid(fluid_name)
+  local containers = {}
+
+  -- Vanilla: barrels are named "[fluid-name]-barrel"
+  local barrel_name = fluid_name .. "-barrel"
+  if prototypes.item[barrel_name] then
+    containers[barrel_name] = true
+  end
+
+  -- Angels petrochem: fluid and its container item share the same name
+  -- e.g. fluid "angels-gas-hydrogen" -> item "angels-gas-hydrogen" (gas canister)
+  --      fluid "angels-liquid-hydrofluoric-acid" -> item "angels-liquid-hydrofluoric-acid"
+  -- Only add if not already found as a barrel and the item actually exists
+  if not containers[fluid_name] and prototypes.item[fluid_name] then
+    containers[fluid_name] = true
+  end
+
+  return containers
+end
+
+---@class NewlyCraftable
+---@field items table<string, boolean>
+---@field fluids table<string, boolean>
+
+---@param technology LuaTechnology
+---@return NewlyCraftable
+local function get_newly_craftable(technology)
   local items = {}
+  local fluids = {}
   local force = technology.force
   local tech_proto = technology.prototype
 
@@ -36,13 +65,15 @@ local function get_newly_craftable_items(technology)
         for _, product in pairs(recipe.products) do
           if product.type == "item" then
             items[product.name] = true
+          elseif product.type == "fluid" then
+            fluids[product.name] = true
           end
         end
       end
     end
   end
 
-  return items
+  return { items = items, fluids = fluids }
 end
 
 ---@param event EventData.on_research_finished
@@ -52,12 +83,13 @@ local function grant_research_rewards(event)
     return
   end
 
-  local constructable_items = get_newly_craftable_items(technology)
+  local newly_craftable = get_newly_craftable(technology)
   local grant_non_placeable = settings.global["research-reward-stacks-grant-non-placeable"].value
   local grant_non_hand_craftable = settings.global["research-reward-stacks-grant-non-hand-craftable"].value
+  local grant_liquids = settings.global["research-reward-stacks-grant-liquids"].value
 
   local item_entries = {}
-  for item_name, _ in pairs(constructable_items) do
+  for item_name, _ in pairs(newly_craftable.items) do
     local item_proto = prototypes.item[item_name]
     if item_proto then
       local placeable = is_placeable(item_proto)
@@ -66,6 +98,19 @@ local function grant_research_rewards(event)
       if (grant_non_placeable or placeable) and (grant_non_hand_craftable or hand_craftable) then
         local stack_size = item_proto.stack_size or 50
         table.insert(item_entries, { name = item_name, proto = item_proto, stack_size = stack_size })
+      end
+    end
+  end
+
+  if grant_liquids then
+    for fluid_name, _ in pairs(newly_craftable.fluids) do
+      local containers = find_containers_for_fluid(fluid_name)
+      for container_name, _ in pairs(containers) do
+        local item_proto = prototypes.item[container_name]
+        if item_proto then
+          local stack_size = item_proto.stack_size or 50
+          table.insert(item_entries, { name = container_name, proto = item_proto, stack_size = stack_size })
+        end
       end
     end
   end
