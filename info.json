@@ -1,8 +1,8 @@
 {
   "name": "research_rewards",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Research Rewards",
-  "author": "local",
+  "author": "Alexander Ottenhoff",
   "factorio_version": "2.0",
   "description": "Grants players a sample stack of any newly craftable items that are unlocked whenever a research completes.",
   "dependencies": ["base >= 2.0.0"],
