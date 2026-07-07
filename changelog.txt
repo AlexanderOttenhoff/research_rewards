@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.3.0
+Date: 2026-07-08
+  Changes:
+    - Updated for Factorio 2.1 compatibility.
+    - Use new recipe categories API (LuaRecipePrototype::categories) replacing the removed category field.
+    - Hand-craftable recipes now detected via the new "hand-crafting" category.
+---------------------------------------------------------------------------------------------------
 Version: 0.2.0
 Date: 2026-06-12
   Features:

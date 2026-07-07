@@ -9,10 +9,19 @@ end
 ---@return boolean
 local function is_hand_craftable(item_name, force)
   for _, recipe in pairs(force.recipes) do
-    if recipe.enabled and recipe.prototype.category == "crafting" then
-      for _, product in pairs(recipe.products) do
-        if product.type == "item" and product.name == item_name then
-          return true
+    if recipe.enabled then
+      local hand_craftable = false
+      for _, cat in pairs(recipe.prototype.categories) do
+        if cat == "hand-crafting" then
+          hand_craftable = true
+          break
+        end
+      end
+      if hand_craftable then
+        for _, product in pairs(recipe.products) do
+          if product.type == "item" and product.name == item_name then
+            return true
+          end
         end
       end
     end
