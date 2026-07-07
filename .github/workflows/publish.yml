@@ -1,0 +1,40 @@
+name: Publish to Mod Portal
+
+on:
+    push:
+        tags:
+            - "v*"
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Get version from info.json
+              id: version
+              run: echo "version=$(jq -r .version info.json)" >> "$GITHUB_OUTPUT"
+
+            - name: Create mod zip
+              run: |
+                  git archive --format=zip \
+                    --prefix="research_rewards_${{ steps.version.outputs.version }}/" \
+                    HEAD \
+                    > "research_rewards_${{ steps.version.outputs.version }}.zip"
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: research_rewards_${{ steps.version.outputs.version }}.zip
+                  generate_release_notes: true
+
+            - name: Upload to Mod Portal
+              run: |
+                  UPLOAD_URL=$(curl -sfS \
+                    -H "Authorization: Bearer ${{ secrets.FACTORIO_MOD_PORTAL_TOKEN }}" \
+                    -F "mod=research_rewards" \
+                    https://mods.factorio.com/api/uploads/init | jq -r .upload_url)
+
+                  curl -sfS \
+                    -F "file=@research_rewards_${{ steps.version.outputs.version }}.zip" \
+                    "$UPLOAD_URL"
