@@ -1,6 +1,6 @@
 # Research Rewards
 
-A Factorio 2.0 mod that grants players a sample stack of any newly craftable items that are unlocked whenever a research completes.
+A Factorio 2.1 mod that grants players a sample stack of any newly craftable items that are unlocked whenever a research completes.
 
 ## Mod compatibility
 
@@ -9,4 +9,4 @@ A Factorio 2.0 mod that grants players a sample stack of any newly craftable ite
 
 ## Requirements
 
-- Factorio 2.0+
+- Factorio 2.1+
