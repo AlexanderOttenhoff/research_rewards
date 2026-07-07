@@ -33,13 +33,10 @@ jobs:
             - name: Upload to Mod Portal
               run: |
                   UPLOAD_URL=$(curl -sfS \
+                    -H "Authorization: Bearer ${{ secrets.FACTORIO_API_KEY }}" \
                     -F "mod=research_rewards" \
-                    -F "username=${{ secrets.FACTORIO_USERNAME }}" \
-                    -F "token=${{ secrets.FACTORIO_TOKEN }}" \
-                    https://mods.factorio.com/api/uploads/init | jq -r .upload_url)
+                    https://mods.factorio.com/api/v2/mods/releases/init_upload | jq -r .upload_url)
 
                   curl -sfS \
                     -F "file=@research_rewards_${{ steps.version.outputs.version }}.zip" \
-                    -F "username=${{ secrets.FACTORIO_USERNAME }}" \
-                    -F "token=${{ secrets.FACTORIO_TOKEN }}" \
                     "$UPLOAD_URL"
