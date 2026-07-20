@@ -49,6 +49,22 @@ end
 ---@field items table<string, boolean>
 ---@field fluids table<string, boolean>
 
+---@param recipe_name string
+---@return boolean
+local function should_skip_recipe_for_rewards(recipe_name)
+  -- Fill-barrel unlocks can enumerate every fluid barrel; only the base barrel should be granted.
+  if string.match(recipe_name, "^fill%-.*%-barrel$") then
+    return true
+  end
+
+  -- Space Age recycling unlocks add one recipe per recyclable item; skip those bulk unlocks.
+  if string.match(recipe_name, "%-recycling$") then
+    return true
+  end
+
+  return false
+end
+
 ---@param technology LuaTechnology
 ---@return NewlyCraftable
 local function get_newly_craftable(technology)
@@ -60,7 +76,7 @@ local function get_newly_craftable(technology)
   for _, effect in pairs(tech_proto.effects or {}) do
     if effect.type == "unlock-recipe" and effect.recipe then
       local recipe = force.recipes[effect.recipe]
-      if recipe then
+      if recipe and not should_skip_recipe_for_rewards(effect.recipe) then
         for _, product in pairs(recipe.products) do
           if product.type == "item" then
             items[product.name] = true
